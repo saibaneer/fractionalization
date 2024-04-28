@@ -2,11 +2,13 @@
 pragma solidity ^0.8.24;
 
 import "../contracts/FactoryInternalLogic.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract AssetFactory is FactoryInternalLogic {
+contract AssetFactory is ReentrancyGuard, FactoryInternalLogic {
 
+    constructor() ReentrancyGuard() {}
     
-    function createNewAsset(Structs.Asset calldata _asset) public {
+    function createNewAsset(Structs.Asset calldata _asset) public nonReentrant {
         _createNewAsset(_asset);
     }
 

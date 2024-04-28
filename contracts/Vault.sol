@@ -4,10 +4,13 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./Storage.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /// @title Vault
 /// @dev Manages token withdrawals, holding the core financial logic.
-contract Vault is Storage {
+contract Vault is ReentrancyGuard, Storage {
+
+    constructor() ReentrancyGuard() {}
 
     using SafeERC20 for IERC20;
 
@@ -15,7 +18,7 @@ contract Vault is Storage {
     /// @param _tokenAddress The address of the token to withdraw
     /// @param _recipient The address of the recipient
     /// @param amount The amount of tokens to withdraw
-    function withdrawTo(address _tokenAddress, address _recipient, uint256 amount) public onlyMultisigController {
+    function withdrawTo(address _tokenAddress, address _recipient, uint256 amount) public onlyMultisigController nonReentrant {
         require(amount > 0, "Amount must be greater than 0");
         require(_tokenAddress != address(0), "Token address cannot be 0");
         require(_recipient != address(0), "Recipient address cannot be 0");

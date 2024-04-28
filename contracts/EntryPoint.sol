@@ -4,10 +4,11 @@ pragma solidity ^0.8.24;
 import "./InternalLogic.sol";
 import "./Getters.sol";
 import "./Setters.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract EntryPoint is Setters, Getters, InternalLogic {
+contract EntryPoint is ReentrancyGuard, Setters, Getters, InternalLogic {
 
-    constructor(address _multiSigController){
+    constructor(address _multiSigController) ReentrancyGuard() {
         _grantRole(ADMIN_ROLE, msg.sender);
         _setRoleAdmin(DEFAULT_ADMIN_ROLE, ADMIN_ROLE);
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -19,7 +20,7 @@ contract EntryPoint is Setters, Getters, InternalLogic {
         address _assetAddress,
         address _tokenAddress,
         uint units
-    ) public {
+    ) public nonReentrant {
         _enterPosition(_assetAddress, _tokenAddress, msg.sender, units);
     }
 
@@ -27,7 +28,7 @@ contract EntryPoint is Setters, Getters, InternalLogic {
         address _assetAddress,
         address _tokenAddress,
         uint units
-    ) public {
+    ) public nonReentrant {
         _exitPosition(_assetAddress, _tokenAddress, msg.sender, units);
     }
 
