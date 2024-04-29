@@ -82,12 +82,14 @@ abstract contract InternalLogic is Storage {
         if(!positionHasExited[_assetAddress]) {
             correspondingStableValueDue = (correspondingStableValueDue * discountFactorInBasisPoints) / 10000;
             depositToken.safeTransfer(_caller, correspondingStableValueDue);
+            assetToken.safeTransferFrom(_caller, address(assetToken), units);
 
             // Invariants to check if the balances are adjusted correctly
             assert(depositToken.balanceOf(vaultAddress) == initialVaultDepositBalance - correspondingStableValueDue);
             assert(assetToken.balanceOf(_caller) == initialCallerAssetBalance - units);
         } else {
             depositToken.safeTransfer(_caller, correspondingStableValueDue);
+            assetToken.safeTransferFrom(_caller, address(assetToken), units);
             // Invariants to check if the balances are adjusted correctly
             assert(depositToken.balanceOf(vaultAddress) == initialVaultDepositBalance - correspondingStableValueDue);
             assert(assetToken.balanceOf(_caller) == initialCallerAssetBalance - units);
