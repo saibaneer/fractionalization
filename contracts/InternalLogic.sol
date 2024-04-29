@@ -21,7 +21,7 @@ abstract contract InternalLogic is Storage {
         address _tokenAddress,
         address _caller,
         uint units
-    ) public {
+    ) internal {
         require(!positionHasExited[_assetAddress], Errors.POSITION_HAS_EXITED);
         require(allowedTokens[_tokenAddress], Errors.TOKEN_NOT_ALLOWED);
         require(vaultAddress != address(0), Errors.VAULT_ADDRESS_NOT_SET);
@@ -59,7 +59,7 @@ abstract contract InternalLogic is Storage {
         address _tokenAddress,
         address _caller,
         uint units
-    ) public onlyHolder {
+    ) internal onlyHolder {
         // get exchange rate
         Structs.ExchangeRate memory exchangeRate = addressToExchangeRate[_assetAddress];
         require(exchangeRate.numerator > 0, Errors.EXCHANGE_RATE_NOT_SET);
