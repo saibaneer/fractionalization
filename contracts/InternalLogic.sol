@@ -36,7 +36,7 @@ abstract contract InternalLogic is Storage {
         depositToken.safeTransferFrom(_caller, vaultAddress, units);
 
         IERC20 assetToken = IERC20(_assetAddress);
-        assetToken.safeTransfer(_caller, units); // has to be called 
+        IModelERC20(_assetAddress).mint(_caller, units); // has to be called 
 
         // Invariants to ensure tokens are correctly transferred
         assert(depositToken.balanceOf(_caller) == initialCallerBalance - units);
@@ -102,4 +102,8 @@ abstract contract InternalLogic is Storage {
     }
 
     
+}
+
+interface IModelERC20 {
+    function mint(address to, uint256 amount) external;
 }
