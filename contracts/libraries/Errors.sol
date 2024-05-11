@@ -21,5 +21,6 @@ library Errors {
     string internal constant NO_ADMIN_ROLE = "Not Authorized to call function";
     string internal constant NO_MULTISIG_CONTROLLER_ROLE = "Bad Multisig Controller Role";
     string internal constant NO_HOLDER_ROLE = "Not Authorized";
+    string internal constant INSUFFICIENT_BALANCE = "Insufficient balance";
 }
 

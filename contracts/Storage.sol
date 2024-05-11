@@ -12,21 +12,24 @@ abstract contract Storage is Permissions {
     /// @notice Address of the vault, central to the financial logic of the platform.
     address internal vaultAddress;
 
-    /// @notice Discount factor in basis points used for calculating discounts on transactions.
-    uint256 internal discountFactorInBasisPoints;
+    // /// @notice Discount factor in basis points used for calculating discounts on transactions.
+    // uint256 internal discountFactorInBasisPoints;
+
+    /// @notice Nonce used for generating unique identifiers for assets.
+    uint256 internal nonce;
 
     /// @notice Mapping of token addresses to their allowance status within the platform.
-    mapping(address => bool) internal allowedTokens;
+    mapping(address acceptedToken => bool) internal isAllowedToken;
 
     /// @notice Mapping of asset addresses to their corresponding asset details.
-    mapping(address => Structs.Asset) internal addressToAsset;
+    mapping(address assetAddress => Structs.Asset) internal addressToAsset;
 
     /// @notice Tracks whether a position associated with an asset has been exited.
-    mapping(address => bool) internal positionHasExited;
+    mapping(address assetAddress => bool) internal positionHasExited;
 
-    /// @notice Mapping of asset addresses to their current exchange rates.
-    mapping(address => Structs.ExchangeRate) internal addressToExchangeRate;
+    // /// @notice Mapping of asset addresses to their current exchange rates.
+    // mapping(address assetAddress => Structs.ExchangeRate) internal addressToExchangeRate;
 
     /// @notice Mapping of asset addresses to their respective URLs for external information.
-    mapping(address => bytes) internal addressToUrl;
+    mapping(address assetAddress => bytes) internal addressToUrl;
 }

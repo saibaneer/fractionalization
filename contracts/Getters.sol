@@ -27,11 +27,11 @@ abstract contract Getters is Storage {
     }
 
     /// @notice Determines if a token is allowed for transactions.
-    /// @dev Checks the allowedTokens mapping to see if a token is authorized for use in the contract.
+    /// @dev Checks the isAllowedToken mapping to see if a token is authorized for use in the contract.
     /// @param _tokenAddress The address of the token to check.
     /// @return bool True if the token is allowed, false otherwise.
     function isTokenAllowed(address _tokenAddress) public view returns(bool) {
-        return allowedTokens[_tokenAddress];
+        return isAllowedToken[_tokenAddress];
     }
 
     /// @notice Fetches the URL associated with an asset.
@@ -42,19 +42,19 @@ abstract contract Getters is Storage {
         return Utils.decodeString(addressToUrl[_assetAddress]);
     }
 
-    /// @notice Gets the exchange rate details for an asset.
-    /// @dev Exchange rates are used to calculate transactions and conversions for the specified asset.
-    /// @param _assetAddress The address of the asset whose exchange rate is being queried.
-    /// @return Structs.ExchangeRate The exchange rate structure containing numerator and denominator.
-    function getAssetExchangeRate(address _assetAddress) public view returns(Structs.ExchangeRate memory) {
-        return addressToExchangeRate[_assetAddress];
-    }
+    // /// @notice Gets the exchange rate details for an asset.
+    // /// @dev Exchange rates are used to calculate transactions and conversions for the specified asset.
+    // /// @param _assetAddress The address of the asset whose exchange rate is being queried.
+    // /// @return Structs.ExchangeRate The exchange rate structure containing numerator and denominator.
+    // function getAssetExchangeRate(address _assetAddress) public view returns(Structs.ExchangeRate memory) {
+    //     return addressToExchangeRate[_assetAddress];
+    // }
 
-     /// @notice Retrieves the current discount factor in basis points.
-    /// @dev Discount factors are used to calculate discounted rates for various transactions.
-    /// @return uint256 The current discount factor in basis points.
-    function getDiscountFactor() public view returns(uint256) {
-        return discountFactorInBasisPoints;
-    }
+    //  /// @notice Retrieves the current discount factor in basis points.
+    // /// @dev Discount factors are used to calculate discounted rates for various transactions.
+    // /// @return uint256 The current discount factor in basis points.
+    // function getDiscountFactor() public view returns(uint256) {
+    //     return discountFactorInBasisPoints;
+    // }
     
 }

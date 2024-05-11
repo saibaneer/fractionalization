@@ -24,12 +24,28 @@ contract EntryPoint is ReentrancyGuard, Setters, Getters, InternalLogic {
         _enterPosition(_assetAddress, _tokenAddress, msg.sender, units);
     }
 
-    function exitPosition(
+    // function exitPosition(
+    //     address _assetAddress,
+    //     address _tokenAddress,
+    //     uint units
+    // ) public nonReentrant {
+    //     _exitPosition(_assetAddress, _tokenAddress, msg.sender, units);
+    // }
+
+    function listPositionForSale(
         address _assetAddress,
         address _tokenAddress,
+        uint units,
+        uint price
+    ) public nonReentrant {
+        _listPositionForSale(_assetAddress, _tokenAddress, msg.sender, units, price);
+    }
+
+    function buyPosition(
+        bytes32 positionHash,
         uint units
     ) public nonReentrant {
-        _exitPosition(_assetAddress, _tokenAddress, msg.sender, units);
+        _buyPosition(positionHash, msg.sender, units);
     }
 
     

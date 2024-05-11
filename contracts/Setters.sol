@@ -24,18 +24,18 @@ abstract contract Setters is Storage {
         _;
     }
 
-    modifier valueChanged(
-        address _addr,
-        uint256 _numerator,
-        uint256 _denominator
-    ) {
-        require(
-            addressToExchangeRate[_addr].numerator != _numerator ||
-                addressToExchangeRate[_addr].denominator != _denominator,
-            Errors.VALUE_ALREADY_SET
-        );
-        _;
-    }
+    // modifier valueChanged(
+    //     address _addr,
+    //     uint256 _numerator,
+    //     uint256 _denominator
+    // ) {
+    //     require(
+    //         addressToExchangeRate[_addr].numerator != _numerator ||
+    //             addressToExchangeRate[_addr].denominator != _denominator,
+    //         Errors.VALUE_ALREADY_SET
+    //     );
+    //     _;
+    // }
 
     modifier differentValue(bool current, bool newValue) {
         require(current != newValue, Errors.VALUE_ALREADY_SET);
@@ -54,8 +54,8 @@ abstract contract Setters is Storage {
     function setAllowedToken(
         address _token,
         bool _status
-    ) internal differentValue(allowedTokens[_token], _status) onlySetter {
-        allowedTokens[_token] = _status;
+    ) internal differentValue(isAllowedToken[_token], _status) onlySetter {
+        isAllowedToken[_token] = _status;
         emit AllowedTokenUpdated(_token, _status);
     }
 
@@ -77,40 +77,40 @@ abstract contract Setters is Storage {
         
     }
 
-    /// @notice Sets the exchange rate for a specific asset
-    /// @dev Emits ExchangeRateUpdated when the exchange rate is changed
-    /// @param _assetAddress The address of the asset
-    /// @param numerator The numerator of the new exchange rate
-    /// @param denominator The denominator of the new exchange rate
-    function setAssetExchangeRate(
-        address _assetAddress,
-        uint256 numerator,
-        uint256 denominator
-    )
-        internal
-        notZeroAddress(_assetAddress)
-        valueChanged(_assetAddress, numerator, denominator)
-        onlySetter
-    {
-        addressToExchangeRate[_assetAddress] = Structs.ExchangeRate(
-            numerator,
-            denominator
-        );
+    // /// @notice Sets the exchange rate for a specific asset
+    // /// @dev Emits ExchangeRateUpdated when the exchange rate is changed
+    // /// @param _assetAddress The address of the asset
+    // /// @param numerator The numerator of the new exchange rate
+    // /// @param denominator The denominator of the new exchange rate
+    // function setAssetExchangeRate(
+    //     address _assetAddress,
+    //     uint256 numerator,
+    //     uint256 denominator
+    // )
+    //     internal
+    //     notZeroAddress(_assetAddress)
+    //     valueChanged(_assetAddress, numerator, denominator)
+    //     onlySetter
+    // {
+    //     addressToExchangeRate[_assetAddress] = Structs.ExchangeRate(
+    //         numerator,
+    //         denominator
+    //     );
         
-        emit ExchangeRateUpdated(_assetAddress, numerator, denominator);
-    }
+    //     emit ExchangeRateUpdated(_assetAddress, numerator, denominator);
+    // }
 
-    /// @notice Updates the discount factor used in pricing calculations
-    /// @dev Emits DiscountFactorUpdated upon changing the factor
-    /// @param _discountFactorInBasisPoints The new discount factor, in basis points
-    function setDiscountFactor(
-        uint256 _discountFactorInBasisPoints
-    ) internal validDiscountFactor(_discountFactorInBasisPoints) onlySetter {
-        require(
-            _discountFactorInBasisPoints != discountFactorInBasisPoints,
-            Errors.VALUE_ALREADY_SET
-        );
-        discountFactorInBasisPoints = _discountFactorInBasisPoints;
-        emit DiscountFactorUpdated(_discountFactorInBasisPoints);
-    }
+    // /// @notice Updates the discount factor used in pricing calculations
+    // /// @dev Emits DiscountFactorUpdated upon changing the factor
+    // /// @param _discountFactorInBasisPoints The new discount factor, in basis points
+    // function setDiscountFactor(
+    //     uint256 _discountFactorInBasisPoints
+    // ) internal validDiscountFactor(_discountFactorInBasisPoints) onlySetter {
+    //     require(
+    //         _discountFactorInBasisPoints != discountFactorInBasisPoints,
+    //         Errors.VALUE_ALREADY_SET
+    //     );
+    //     discountFactorInBasisPoints = _discountFactorInBasisPoints;
+    //     emit DiscountFactorUpdated(_discountFactorInBasisPoints);
+    // }
 }
