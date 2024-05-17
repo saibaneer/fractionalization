@@ -16,6 +16,16 @@ const { expect } = require("chai");
 const { createAsset, createPosition } = require("../structs");
 const { ethers } = require("hardhat");
 
+const emptyResult = [
+    '0x0000000000000000000000000000000000000000000000000000000000000000',
+    '0x0000000000000000000000000000000000000000',
+    '0x0000000000000000000000000000000000000000',
+    '0x0000000000000000000000000000000000000000',
+    0n,
+    0n,
+    0n
+  ]
+
 describe("EndToEnd Tests", function () {
   async function deployAssetFactoryFixture() {
     const [owner, alice, bob] = await ethers.getSigners();
@@ -182,7 +192,7 @@ describe("EndToEnd Tests", function () {
                 expect(await paymentERC20.balanceOf(alice.address)).to.equal(ethers.parseEther("7.5"));
                 })
             })
-            describe("Delist Some of the Position Test", function(){
+            describe("Delist Position Test", function(){
                 it("should allow a user delist some of their position", async function(){
                     const {assetFactory, owner, alice, bob } = await loadFixture(deployAssetFactoryFixture);
                     const {paymentERC20} = await loadFixture(deployPaymentERC20Fixture);
@@ -228,8 +238,56 @@ describe("EndToEnd Tests", function () {
                     expect(userPositionsAfterDelist2[0].units).to.equal(ethers.parseEther("3"));
                     expect(userPositionsAfterDelist2[0]).to.deep.equal(userPositionsAfterDelist1);
                 })
+                it("should allow a user delist all of their position", async function(){
+                    const {assetFactory, owner, alice, bob } = await loadFixture(deployAssetFactoryFixture);
+                    const {paymentERC20} = await loadFixture(deployPaymentERC20Fixture);
+                    const {entryPoint} = await loadFixture(deployEntryPointFixture);
+                    const {vault} = await loadFixture(deployVaultFixture);
+        
+                    const mdaoAsset = createAsset(100, "HomeAsset123", "MDAO", "https://mdao.com");
+                    const tx = await assetFactory.connect(owner).createNewAsset(mdaoAsset);
+                    let assetCreatedEvent = assetFactory.filters.CreatedNewAsset();
+                    let events = await assetFactory.queryFilter(assetCreatedEvent, "latest");
+                    const assetAddress = events[0].args[0][1];
+                    const assetObject = await ethers.getContractAt("ModelERC20", assetAddress);
+        
+                    expect(await assetObject.balanceOf(alice.address)).to.equal(0);
+                    await paymentERC20.connect(owner).mint(alice.address, ethers.parseEther("20"));
+                    await paymentERC20.connect(owner).mint(bob.address, ethers.parseEther("200"));
+                    await paymentERC20.connect(alice).approve(await entryPoint.getAddress(), ethers.parseEther("20"));
+                    await entryPoint.connect(owner).setAllowedToken(await paymentERC20.getAddress(), true);
+                    await entryPoint.connect(owner).setVaultAddress(await vault.getAddress());
+                    await entryPoint.connect(owner).setFactoryAddress(await assetFactory.getAddress());
+                    
+                    
+                    await entryPoint.connect(alice).enterPosition(assetAddress, await paymentERC20.getAddress(), ethers.parseEther("20"));
+                    expect(await assetObject.balanceOf(alice.address)).to.equal(ethers.parseEther("20"));
+                    expect(await paymentERC20.balanceOf(alice.address)).to.equal(0);
+                    
+                    await assetObject.connect(alice).approve(await entryPoint.getAddress(), ethers.parseEther("5"));
+                    await entryPoint.connect(alice).listPositionForSale(assetAddress, await paymentERC20.getAddress(), ethers.parseEther("5"), 15000);
+    
+                    assetCreatedEvent = entryPoint.filters.ListedPositionForSale();
+                    events = await entryPoint.queryFilter(assetCreatedEvent, "latest");
+                    let eventObj = events[0].args;
+                    // console.log(eventObj[5]);
+                    const positionHash = eventObj[5];
+                    const position = await entryPoint.positionHashToAsset(positionHash);
+                    const userPositions = await entryPoint.getUserPositions(alice.address);
+                    expect(userPositions[0]).to.deep.equal(position);
+
+                    await entryPoint.connect(alice).delistPosition(positionHash, ethers.parseEther("5"));
+                    const userPositionsAfterDelist1 = await entryPoint.positionHashToAsset(positionHash);
+                    // console.log(userPositionsAfterDelist1);
+                    const userPositionsAfterDelist2 = await entryPoint.getUserPositions(alice.address);
+                    // console.log(userPositionsAfterDelist2);
+                    expect(userPositionsAfterDelist1).to.deep.equal(emptyResult);
+                    expect(userPositionsAfterDelist2).to.be.empty;
+                    // expect(userPositionsAfterDelist2[0].units).to.equal(ethers.parseEther("0"));
+                    // expect(userPositionsAfterDelist2).to.deep.equal(userPositionsAfterDelist1);
+                })
             })
-            describe.skip("Delist All of the Position Test", function(){})
+            
 
         })
 
