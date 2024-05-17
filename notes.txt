@@ -1,0 +1,6 @@
+- Deploy the Asset Factory
+- Capture the Asset Address
+- Deploy a payment ERC20
+- Use the payment ERC20 to "Enter Position"
+- Having Entered a Position, "List a Position for Sale"
+- Having Listed a Position for Sale, Use a second user to buy that position

@@ -6,7 +6,13 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract AssetFactory is ReentrancyGuard, FactoryInternalLogic {
 
-    constructor() ReentrancyGuard() {}
+    constructor() ReentrancyGuard() {
+        _grantRole(ADMIN_ROLE, msg.sender);
+        _setRoleAdmin(DEFAULT_ADMIN_ROLE, ADMIN_ROLE);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(SETTER_MANAGER_ROLE, msg.sender);
+        // _grantRole(MULTISIG_CONTROLLER_ROLE, _multiSigController);
+    }
     
     function createNewAsset(Structs.Asset calldata _asset) public nonReentrant {
         _createNewAsset(_asset);

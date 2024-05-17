@@ -173,6 +173,49 @@ abstract contract InternalLogic is SupplementaryStorage, Storage {
         userToPosition[_caller].push(positionHashToAsset[hash_id]);
     }
 
+    function _delistAsset(bytes32 positionHash, address _calller, uint units) internal {
+        Structs.Position storage position = positionHashToAsset[positionHash];
+        require(
+            position.assetAddress != address(0),
+            Errors.ASSET_DOES_NOT_EXIST
+        );
+
+        require(
+            position.owner == _calller,
+            Errors.ONLY_OWNER_CAN_DELIST
+        );
+
+        IERC20 assetToken = IERC20(position.assetAddress);
+
+        require(
+            assetToken.balanceOf(address(this)) >= units,
+            Errors.INSUFFICIENT_AMOUNT_IN_CONTRACT
+        );
+
+        if (position.units == units) {
+            for (uint i = 0; i < userToPosition[position.owner].length; i++) {
+                if (userToPosition[position.owner][i].hashId == positionHash) {
+                    userToPosition[position.owner][i] = userToPosition[
+                        position.owner
+                    ][userToPosition[position.owner].length - 1];
+                    userToPosition[position.owner].pop();
+                    break;
+                }
+            }
+            delete positionHashToAsset[positionHash];
+            _revokeRole(HOLDER, position.owner);
+        } else {
+            Structs.reduceUnits(position, units);
+            Structs.reduceUnits(positionHashToAsset[positionHash], units);
+        }
+
+        assetToken.safeTransfer(_calller, units);
+
+        if (assetToken.balanceOf(_calller) > 0) {
+            _grantRole(HOLDER, _calller);
+        }
+    }
+
     function _buyPosition(bytes32 positionHash,address _caller, uint units) internal {
         Structs.Position storage position = positionHashToAsset[positionHash];
         require(

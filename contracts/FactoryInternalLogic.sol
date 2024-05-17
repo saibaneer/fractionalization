@@ -11,6 +11,8 @@ import "./Storage.sol";
 /// @notice Manages the creation, update, and deletion of assets within the platform
 /// @dev This contract includes internal functions that can only be called by authorized roles
 abstract contract FactoryInternalLogic is Storage {
+
+    event CreatedNewAsset(Structs.Asset newAsset);
     
 
     /// @notice Creates a new asset with given parameters
@@ -39,6 +41,7 @@ abstract contract FactoryInternalLogic is Storage {
         asset.assetAddress = newAsset;
         addressToAsset[newAsset] = asset;
         addressToUrl[newAsset] = url;
+        emit CreatedNewAsset(asset);
     }
 
     /// @notice Updates the URL associated with an asset

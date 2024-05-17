@@ -22,5 +22,7 @@ library Errors {
     string internal constant NO_MULTISIG_CONTROLLER_ROLE = "Bad Multisig Controller Role";
     string internal constant NO_HOLDER_ROLE = "Not Authorized";
     string internal constant INSUFFICIENT_BALANCE = "Insufficient balance";
+    string internal constant ONLY_OWNER_CAN_DELIST = "Only owner can delist";
+    string internal constant INSUFFICIENT_AMOUNT_IN_CONTRACT = "Insufficient amount in contract";
 }
 
