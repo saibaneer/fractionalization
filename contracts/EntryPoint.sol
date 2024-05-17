@@ -48,6 +48,9 @@ contract EntryPoint is ReentrancyGuard, Setters, Getters, InternalLogic {
         _buyPosition(positionHash, msg.sender, units);
     }
 
+    function delistPosition(bytes32 positionHash, uint256 units) public nonReentrant {
+        _delistAsset(positionHash, msg.sender, units);
+    }
     
 
 }

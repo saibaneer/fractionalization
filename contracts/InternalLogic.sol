@@ -6,6 +6,8 @@ import "./libraries/Errors.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./SupplementaryEntryPointStorage.sol";
 
+
+
 abstract contract InternalLogic is SupplementaryStorage, Storage {
     using SafeERC20 for IERC20;
 
@@ -22,6 +24,23 @@ abstract contract InternalLogic is SupplementaryStorage, Storage {
         address indexed caller,
         uint units,
         uint price,
+        bytes32 positionHash
+    );
+
+    event BoughtPosition(
+        address indexed assetAddress,
+        address indexed tokenAddress,
+        address indexed caller,
+        uint units,
+        uint price,
+        bytes32 positionHash
+    );
+
+    event DelistedPosition(
+        address indexed assetAddress,
+        address indexed tokenAddress,
+        address indexed caller,
+        uint units,
         bytes32 positionHash
     );
 
@@ -218,7 +237,7 @@ abstract contract InternalLogic is SupplementaryStorage, Storage {
             assetToken.balanceOf(address(this)) >= units,
             Errors.INSUFFICIENT_AMOUNT_IN_CONTRACT
         );
-
+        Structs.Position memory position_m = position;
         if (position.units == units) {
             for (uint i = 0; i < userToPosition[position.owner].length; i++) {
                 if (userToPosition[position.owner][i].hashId == positionHash) {
@@ -233,7 +252,12 @@ abstract contract InternalLogic is SupplementaryStorage, Storage {
             _revokeRole(HOLDER, position.owner);
         } else {
             Structs.reduceUnits(position, units);
-            Structs.reduceUnits(positionHashToAsset[positionHash], units);
+            for(uint i = 0; i < userToPosition[position.owner].length; i++) {
+                if(userToPosition[position.owner][i].hashId == positionHash) {
+                    Structs.reduceUnits(userToPosition[position.owner][i], units);
+                    break;
+                }
+            }
         }
 
         assetToken.safeTransfer(_calller, units);
@@ -241,6 +265,14 @@ abstract contract InternalLogic is SupplementaryStorage, Storage {
         if (assetToken.balanceOf(_calller) > 0) {
             _grantRole(HOLDER, _calller);
         }
+
+        emit DelistedPosition(
+            position_m.assetAddress,
+            position_m.preferredTokenForSale,
+            _calller,
+            units,
+            positionHash
+        );
     }
 
     function _buyPosition(bytes32 positionHash,address _caller, uint units) internal {
@@ -259,7 +291,7 @@ abstract contract InternalLogic is SupplementaryStorage, Storage {
             preferredToken.balanceOf(_caller) >= value,
             Errors.INSUFFICIENT_BALANCE
         );
-
+        Structs.Position memory position_m  = position;
         if (position.units == units) {
             for (uint i = 0; i < userToPosition[position.owner].length; i++) {
                 if (userToPosition[position.owner][i].hashId == positionHash) {
@@ -277,13 +309,21 @@ abstract contract InternalLogic is SupplementaryStorage, Storage {
             Structs.reduceUnits(position, units);
             Structs.reduceUnits(positionHashToAsset[positionHash], units);
         }
-
-        preferredToken.safeTransferFrom(_caller, position.owner, value);
+    
+        preferredToken.safeTransferFrom(_caller, position_m.owner, value);
         assetToken.safeTransfer(_caller, units);
 
         if (assetToken.balanceOf(_caller) > 0) {
             _grantRole(HOLDER, _caller);
         }
+        emit BoughtPosition(
+            position.assetAddress,
+            position.preferredTokenForSale,
+            _caller,
+            units,
+            position.price,
+            positionHash
+        );
     }
 }
 
