@@ -9,6 +9,22 @@ import "./SupplementaryEntryPointStorage.sol";
 abstract contract InternalLogic is SupplementaryStorage, Storage {
     using SafeERC20 for IERC20;
 
+    event EnteredPosition(
+        address indexed assetAddress,
+        address indexed tokenAddress,
+        address indexed caller,
+        uint units
+    );
+
+    event ListedPositionForSale(
+        address indexed assetAddress,
+        address indexed tokenAddress,
+        address indexed caller,
+        uint units,
+        uint price,
+        bytes32 positionHash
+    );
+
     /// @notice Enters a position for an asset with specific units
     /// @dev Transfers the specified units from the caller to the vault
     /// @param _assetAddress The address of the asset to enter position
@@ -49,6 +65,7 @@ abstract contract InternalLogic is SupplementaryStorage, Storage {
         assert(assetToken.balanceOf(_caller) >= units); // Assuming assetToken starts from zero or increases
 
         _grantRole(HOLDER, _caller);
+        emit EnteredPosition(_assetAddress, _tokenAddress, _caller, units);
     }
 
     // / @notice Exits a position for an asset with specific units
@@ -173,6 +190,14 @@ abstract contract InternalLogic is SupplementaryStorage, Storage {
         );
 
         userToPosition[_caller].push(positionHashToAsset[hash_id]);
+        emit ListedPositionForSale(
+            _assetAddress,
+            _preferredToken,
+            _caller,
+            units,
+            price,
+            hash_id
+        );
     }
 
     function _delistAsset(bytes32 positionHash, address _calller, uint units) internal {
@@ -225,7 +250,7 @@ abstract contract InternalLogic is SupplementaryStorage, Storage {
             Errors.ASSET_DOES_NOT_EXIST
         );
 
-        uint value = units * position.price;
+        uint value = (units * position.price)/10_000; // to get value corrected for basis points.
 
         IERC20 assetToken = IERC20(position.assetAddress);
         IERC20 preferredToken = IERC20(position.preferredTokenForSale);
