@@ -26,8 +26,9 @@ abstract contract InternalLogic is SupplementaryStorage, Storage {
         require(vaultAddress != address(0), Errors.VAULT_ADDRESS_NOT_SET);
         require(units > 0, Errors.INVALID_UNITS);
         require(_caller != address(0), Errors.ADDRESS_ZERO_NOT_ALLOWED);
+        string memory url = IAssetFactory(assetFactoryAddress).getAssetUrl(_assetAddress);
         require(
-            addressToUrl[_assetAddress].length > 0,
+            bytes(url).length > 0,
             Errors.ASSET_DOES_NOT_EXIST
         );
 
@@ -132,8 +133,9 @@ abstract contract InternalLogic is SupplementaryStorage, Storage {
         require(_assetAddress != address(0), Errors.ADDRESS_ZERO_NOT_ALLOWED);
         require(_preferredToken != address(0), Errors.ADDRESS_ZERO_NOT_ALLOWED);
         require(units > 0, Errors.INVALID_UNITS);
+        string memory url = IAssetFactory(assetFactoryAddress).getAssetUrl(_assetAddress);
         require(
-            addressToUrl[_assetAddress].length > 0,
+            bytes(url).length > 0,
             Errors.ASSET_DOES_NOT_EXIST
         );
 
@@ -262,4 +264,8 @@ abstract contract InternalLogic is SupplementaryStorage, Storage {
 
 interface IModelERC20 {
     function mint(address to, uint256 amount) external;
+}
+
+interface IAssetFactory {
+    function getAssetUrl(address _assetAddress) external view returns (string memory);
 }

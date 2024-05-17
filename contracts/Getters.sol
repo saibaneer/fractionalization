@@ -39,7 +39,8 @@ abstract contract Getters is Storage {
     /// @param _assetAddress The address of the asset whose URL is being queried.
     /// @return string The URL associated with the asset.
     function getAssetUrl(address _assetAddress) public view returns(string memory) {
-        return Utils.decodeString(addressToUrl[_assetAddress]);
+        return IAssetFactoryA(assetFactoryAddress).getAssetUrl(_assetAddress);
+        // return Utils.decodeString(addressToUrl[_assetAddress]);
     }
 
     // /// @notice Gets the exchange rate details for an asset.
@@ -57,4 +58,8 @@ abstract contract Getters is Storage {
     //     return discountFactorInBasisPoints;
     // }
     
+}
+
+interface IAssetFactoryA {
+    function getAssetUrl(address _assetAddress) external view returns (string memory);
 }

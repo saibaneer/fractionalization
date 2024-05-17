@@ -10,7 +10,13 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 /// @dev Manages token withdrawals, holding the core financial logic.
 contract Vault is ReentrancyGuard, Storage {
 
-    constructor() ReentrancyGuard() {}
+    constructor() ReentrancyGuard() {
+        _grantRole(ADMIN_ROLE, msg.sender);
+        _setRoleAdmin(DEFAULT_ADMIN_ROLE, ADMIN_ROLE);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(SETTER_MANAGER_ROLE, msg.sender);
+        _grantRole(MULTISIG_CONTROLLER_ROLE, msg.sender);
+    }
 
     using SafeERC20 for IERC20;
 

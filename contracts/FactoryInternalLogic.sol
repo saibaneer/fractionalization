@@ -12,6 +12,9 @@ import "./Storage.sol";
 /// @dev This contract includes internal functions that can only be called by authorized roles
 abstract contract FactoryInternalLogic is Storage {
 
+    /// @notice Mapping of asset addresses to their respective URLs for external information.
+    mapping(address assetAddress => bytes) internal addressToUrl;
+
     event CreatedNewAsset(Structs.Asset newAsset);
     
 

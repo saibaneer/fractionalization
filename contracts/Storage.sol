@@ -12,6 +12,9 @@ abstract contract Storage is Permissions {
     /// @notice Address of the vault, central to the financial logic of the platform.
     address internal vaultAddress;
 
+    /// @notice Address of the asset factory contract.
+    address internal assetFactoryAddress;
+
     // /// @notice Discount factor in basis points used for calculating discounts on transactions.
     // uint256 internal discountFactorInBasisPoints;
 
@@ -30,6 +33,5 @@ abstract contract Storage is Permissions {
     // /// @notice Mapping of asset addresses to their current exchange rates.
     // mapping(address assetAddress => Structs.ExchangeRate) internal addressToExchangeRate;
 
-    /// @notice Mapping of asset addresses to their respective URLs for external information.
-    mapping(address assetAddress => bytes) internal addressToUrl;
+    
 }

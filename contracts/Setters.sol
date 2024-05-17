@@ -54,7 +54,7 @@ abstract contract Setters is Storage {
     function setAllowedToken(
         address _token,
         bool _status
-    ) internal differentValue(isAllowedToken[_token], _status) onlySetter {
+    ) public differentValue(isAllowedToken[_token], _status) onlySetter {
         isAllowedToken[_token] = _status;
         emit AllowedTokenUpdated(_token, _status);
     }
@@ -64,7 +64,7 @@ abstract contract Setters is Storage {
     /// @param _vaultAddress The new vault address to set
     function setVaultAddress(
         address _vaultAddress
-    ) internal notZeroAddress(_vaultAddress) onlySetter {
+    ) public notZeroAddress(_vaultAddress) onlySetter {
         require(_vaultAddress != vaultAddress, Errors.VALUE_ALREADY_SET);
         address oldVaultAddress = vaultAddress;
         vaultAddress = _vaultAddress;
@@ -77,40 +77,18 @@ abstract contract Setters is Storage {
         
     }
 
-    // /// @notice Sets the exchange rate for a specific asset
-    // /// @dev Emits ExchangeRateUpdated when the exchange rate is changed
-    // /// @param _assetAddress The address of the asset
-    // /// @param numerator The numerator of the new exchange rate
-    // /// @param denominator The denominator of the new exchange rate
-    // function setAssetExchangeRate(
-    //     address _assetAddress,
-    //     uint256 numerator,
-    //     uint256 denominator
-    // )
-    //     internal
-    //     notZeroAddress(_assetAddress)
-    //     valueChanged(_assetAddress, numerator, denominator)
-    //     onlySetter
-    // {
-    //     addressToExchangeRate[_assetAddress] = Structs.ExchangeRate(
-    //         numerator,
-    //         denominator
-    //     );
-        
-    //     emit ExchangeRateUpdated(_assetAddress, numerator, denominator);
-    // }
+    function setFactoryAddress(
+        address _factoryAddress
+    ) public notZeroAddress(_factoryAddress) onlySetter {
+        require(_factoryAddress != assetFactoryAddress, Errors.VALUE_ALREADY_SET);
+        address oldFactoryAddress = assetFactoryAddress;
+        assetFactoryAddress = _factoryAddress;
+        // Invariant to check vault address change correctly applied
+        assert(
+            assetFactoryAddress == _factoryAddress && assetFactoryAddress != oldFactoryAddress
+        );
+        emit VaultAddressUpdated(_factoryAddress, oldFactoryAddress);
 
-    // /// @notice Updates the discount factor used in pricing calculations
-    // /// @dev Emits DiscountFactorUpdated upon changing the factor
-    // /// @param _discountFactorInBasisPoints The new discount factor, in basis points
-    // function setDiscountFactor(
-    //     uint256 _discountFactorInBasisPoints
-    // ) internal validDiscountFactor(_discountFactorInBasisPoints) onlySetter {
-    //     require(
-    //         _discountFactorInBasisPoints != discountFactorInBasisPoints,
-    //         Errors.VALUE_ALREADY_SET
-    //     );
-    //     discountFactorInBasisPoints = _discountFactorInBasisPoints;
-    //     emit DiscountFactorUpdated(_discountFactorInBasisPoints);
-    // }
+        
+    }
 }
