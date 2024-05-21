@@ -6,6 +6,9 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract AssetFactory is ReentrancyGuard, FactoryInternalLogic {
 
+
+
+//TODO: Add modifiers to restrict access to functions
     constructor() ReentrancyGuard() {
         _grantRole(ADMIN_ROLE, msg.sender);
         _setRoleAdmin(DEFAULT_ADMIN_ROLE, ADMIN_ROLE);
